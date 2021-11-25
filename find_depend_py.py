@@ -8,6 +8,7 @@ Authors     : warpin
 CreateDate  : 2021/11/23
 """
 import os
+import sys
 import shutil
 from argparse import ArgumentParser
 
@@ -33,7 +34,9 @@ def rm_pyc_files(dire):
     """Remove all .pyc file in the given directory."""
     pyc_files = find_pyc_files(dire)
     for fp in pyc_files:
+        print(f"Removing {fp}")
         os.remove(fp)
+    print(f"{len(pyc_files)} .pyc were removed.")
 
 
 def find_useful_py_scripts(dire):
@@ -98,32 +101,32 @@ def copy_useful_py_to_dir(src, dst, replace):
                         print(f"{des_p} was replaced by {src_p}")
                     else:
                         n_fail += 1
-                        print(f"{src_p} was blocked by {des_p}")
+                        print(f"WARNING - {src_p} was blocked by {des_p}")
                 else:
                     shutil.copy(src_p, des_p)
                     n_succeed += 1
                     print(f"{src_p} -> {des_p}")
             else:
-                if not os.path.isfile(des_p):
+                if not os.path.isdir(des_p):
                     os.makedirs(des_p)
     print(f"{n_succeed} succeed, {n_fail} failed.")
 
 
 if __name__ == '__main__':
     parser = ArgumentParser('find_dependent_py')
-    parser.add_argument('--dir', '-d', type=str, help="Where to find dependent python scripts.")
+    parser.add_argument('--find', '-f', type=str, help="Find dependent python scripts in the given directory.")
+    parser.add_argument('--remove', '-rm', type=str, help="Remove .pyc files from the given directory recursively.")
     parser.add_argument('--copy', '-c', type=str, nargs='+', help="Copy dependent python scripts from src to dst.")
     parser.add_argument('--replace', '-r', action='store_true', help="If replace the destination files when src and dst have the same name.")
     args = parser.parse_args()
 
-    d, copy = args.dir, args.copy
+    f, copy, rm = args.find, args.copy, args.remove
 
-    if copy is not None:
-        assert len(copy) == 2, 'The length of --copy must be 2.'
-        copy_useful_py_to_dir(copy[0], copy[1], args.replace)
-    else:
-        d = d if d is not None else '.'
-        useful_pys, miss_pys = find_useful_py_scripts(d)
+    if f is not None:
+        if not os.path.isdir(f):
+            print(f"ERROR - {f} is not a directory.")
+            sys.exit()
+        useful_pys, miss_pys = find_useful_py_scripts(f)
         print('=' * 25 + f'{len(useful_pys)} useful python scripts' + '=' * 25)
         for fp in useful_pys:
             print(fp)
@@ -131,3 +134,19 @@ if __name__ == '__main__':
         print('=' * 25 + f'{len(miss_pys)} missing python scripts' + '=' * 25)
         for fp in miss_pys:
             print(fp)
+
+    if rm is not None:
+        if not os.path.isdir(rm):
+            print(f"ERROR - {rm} is not a directory.")
+            sys.exit()
+        rm_pyc_files(rm)
+
+    if copy is not None:
+        assert len(copy) == 2, 'The length of --copy must be 2.'
+        if not os.path.isdir(copy[0]):
+            print(f"ERROR - {copy[0]} is not a directory.")
+            sys.exit()
+        if not os.path.isdir(copy[1]):
+            print(f"ERROR - {copy[1]} is not a directory.")
+            sys.exit()
+        copy_useful_py_to_dir(copy[0], copy[1], args.replace)

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Description : Find dependent python scripts of a python script in a project directory. You need to
-1) Run the python script whose dependencies you want to find. This will generate .pyc corresponding to these dependent python scripts.
-2) Run this script. You can just view the dependent scripts or copy then to a given directory.
+Description : Find dependent python scripts of a python script in a project directory.
 
 Authors     : warpin
 CreateDate  : 2021/11/23

@@ -15,7 +15,7 @@ pyc_dir_name = '__pycache__'
 
 
 def find_pyc_files(dire):
-    """Find all .pyc file in the given directory."""
+    """Find all .pyc file in the given directory recursively."""
     pyc_files = []
     for file in os.listdir(dire):
         fp = os.path.join(dire, file)
@@ -29,7 +29,7 @@ def find_pyc_files(dire):
 
 
 def rm_pyc_files(dire):
-    """Remove all .pyc file in the given directory."""
+    """Remove all .pyc file in the given directory recursively."""
     pyc_files = find_pyc_files(dire)
     for fp in pyc_files:
         print(f"Removing {fp}")
@@ -37,10 +37,17 @@ def rm_pyc_files(dire):
     print(f"{len(pyc_files)} .pyc were removed.")
 
 
-def find_useful_py_scripts(dire):
-    """Find all dependent .py scripts in the given directory."""
+def find_dependent_py_scripts(dire):
+    """Find all dependent .py scripts in the given directory.
+    Args:
+        dire: The given directory.
+    Returns:
+        dep_pys: The dependent python scripts.
+        miss_pys: There may be some pyc files without corresponding py files.
+    Notes: The dependent .py scripts are detected by the corresponding .pyc files.
+    """
     pyc_files = find_pyc_files(dire)
-    useful_pys = []
+    dep_pys = []
     miss_pys = []
     for fp in pyc_files:
         path, name = os.path.split(fp)
@@ -55,8 +62,8 @@ def find_useful_py_scripts(dire):
         if not os.path.isfile(py_fp):
             miss_pys.append(fp)
             continue
-        useful_pys.append(py_fp)
-    return useful_pys, miss_pys
+        dep_pys.append(py_fp)
+    return dep_pys, miss_pys
 
 
 def copy_useful_py_to_dir(src, dst, replace):
@@ -66,7 +73,7 @@ def copy_useful_py_to_dir(src, dst, replace):
         dst: Destination directory.
         replace: If replace the destination files.
     """
-    useful_pys, miss_pys = find_useful_py_scripts(src)
+    useful_pys, miss_pys = find_dependent_py_scripts(src)
     print('='*25 + f'{len(useful_pys)} useful python scripts' + '=' * 25)
     for fp in useful_pys:
         print(fp)
@@ -124,8 +131,8 @@ if __name__ == '__main__':
         if not os.path.isdir(f):
             print(f"ERROR - {f} is not a directory.")
             sys.exit()
-        useful_pys, miss_pys = find_useful_py_scripts(f)
-        print('=' * 25 + f'{len(useful_pys)} useful python scripts' + '=' * 25)
+        useful_pys, miss_pys = find_dependent_py_scripts(f)
+        print('=' * 25 + f'{len(useful_pys)} dependent python scripts' + '=' * 25)
         for fp in useful_pys:
             print(fp)
 

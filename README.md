@@ -1,6 +1,6 @@
 # About
 
-This tool can help you find out scripts that a python script depends on in a project.
+This tool can help you to find out scripts that a python script depends on in a project directory.
 
 In python development, as time goes on, there will be many py scripts in the project directory, and only a small part of them are needed when deploying. There are many unrelated scripts, which makes it very uncomfortable. It is troublesome to screen them one by one. Is there any tool that can automatically extract the relevant py scripts? If so, please let me know! 
 
@@ -15,7 +15,7 @@ git clone https://github.com/wapping/DependPy.git
 cd DependPy
 ```
 
-- View and remove .pyc
+- View and remove .pyc files
 
    When running a python script, there will be .pyc files generated corresponding to the python scripts it depends on.
 
@@ -31,7 +31,7 @@ cd DependPy
 
    1. Remove all .pyc files from your project directory.
 
-   2. Run the main program
+   2. Run the main program.
 
    3. View all .pyc files in your project directory.
 
